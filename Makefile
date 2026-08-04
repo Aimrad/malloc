@@ -7,12 +7,13 @@ endif
 #Variables
 
 NAME		= libft_malloc_$(HOSTTYPE).so
-INCLUDE		= include
+INCLUDE		= includes
 LIBFT		= libft
-SRC_DIR		= src/
+SRC_DIR		= srcs/
 OBJ_DIR		= obj/
 CC			= gcc
 CFLAGS		= -Wall -Werror -Wextra -I
+DEBUGFLAGS	= -g3 -O0
 RM			= rm -f
 AR			= ar rcs
 
@@ -30,7 +31,7 @@ WHITE = \033[0;97m
 
 #Sources
 
-SRC_FILES	=
+SRC_FILES	= ft_malloc
 
 
 SRC 		= 	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRC_FILES)))
@@ -42,10 +43,18 @@ OBJF		=	.cache_exists
 
 all:		$(NAME)
 
+debug:		$(LIBFT)/libft.a
+			@$(CC) $(DEBUGFLAGS) -I$(INCLUDE) -I$(LIBFT)/include $(SRC) $(LIBFT)/libft.a -o a.out
+			@echo "$(GREEN)debug executable compiled!$(DEF_COLOR)"
+
+$(LIBFT)/libft.a:
+			@$(MAKE) -C $(LIBFT)
+
 $(NAME):	$(OBJ)
 			@make -C $(LIBFT)
 			@cp libft/libft.a .
 			@mv libft.a $(NAME)
+			@if [ ! -e libft_malloc.so ]; then ln -s $(NAME) libft_malloc.so; fi
 			@$(AR) $(NAME) $(OBJ)
 			@echo "$(GREEN)malloc compiled!$(DEF_COLOR)"
 
@@ -64,6 +73,8 @@ clean:
 fclean:		clean
 			@$(RM) -f $(NAME)
 			@$(RM) -f $(LIBFT)/libft.a
+			@$(RM) libft_malloc.so
+			@$(RM) a.out
 			@echo "$(CYAN)malloc executable files cleaned!$(DEF_COLOR)"
 			@echo "$(CYAN)libft executable files cleaned!$(DEF_COLOR)"
 
@@ -73,4 +84,4 @@ re:			fclean all
 norm:
 			@norminette $(SRC) $(INCLUDE) $(LIBFT) | grep -v Norme -B1 || true
 
-.PHONY:		all clean fclean re norm
+.PHONY:		all debug clean fclean re norm
