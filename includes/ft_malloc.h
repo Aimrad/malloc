@@ -25,6 +25,7 @@ typedef struct bloc_header
 {
 	bool				is_free;
 	size_t				size;
+	struct bloc_header	*prev;
 	struct bloc_header	*next;
 }	t_bloc;
 

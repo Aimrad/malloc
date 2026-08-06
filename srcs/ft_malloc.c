@@ -16,14 +16,44 @@ t_bloc *split_block(t_bloc *bloc, size_t size)
 	new_free_bloc->is_free = 1;
 	new_free_bloc->size = bloc->size - total_occupied;
 
-	g_zone->free_list = bloc->next;
-	new_free_bloc->next = g_zone->free_list;
-	g_zone->free_list = new_free_bloc;
-
 	bloc->is_free = 0;
 	bloc->size = total_occupied;
 
-	return bloc;
+	return new_free_bloc;
+}
+
+void insert_bloc(t_zone* zone, t_bloc* insert)
+{
+	t_bloc*	curr = zone->free_list;
+	t_bloc* prev = NULL;
+
+	while (curr && curr->next)
+	{
+		if (prev == NULL && insert < curr)
+		{
+			insert->next = curr;
+			insert->prev = NULL;
+			curr->prev = insert;
+			zone->free_list = insert;
+			return ;
+		}
+		else if (insert > curr && insert < curr->next)
+		{
+			insert->prev = curr;
+			insert->next = curr->next;
+			
+			curr->next->prev = insert;
+			curr->next = insert;
+			return ;
+		}
+		prev = curr;
+		curr = curr->next;
+	}
+	
+	insert->prev = curr;
+	insert->next = NULL;
+
+	curr->next = insert;
 }
 
 static t_bloc *find_free_space(size_t size)
@@ -40,22 +70,29 @@ static t_bloc *find_free_space(size_t size)
 		type = LARGE;
 
 	t_zone*	curr_zone = g_zone;
-	t_bloc*	curr_free_block;
-	
+
 	while (curr_zone)
 	{
 		if (curr_zone->type == type)
 		{
-			curr_free_block = curr_zone->free_list;
-			while (curr_free_block)
+			t_bloc* prev = NULL;
+			t_bloc*	curr = curr_zone->free_list;
+			while (curr)
 			{
-				if (curr_free_block->is_free && curr_free_block->size >= size + sizeof(t_bloc))
+				if (curr->is_free && curr->size >= size + sizeof(t_bloc))
 				{
-					g_zone->free_list = curr_free_block->next;
-					curr_free_block = split_block(curr_free_block, size);
-					return curr_free_block;
+					if (prev)
+						prev->next = curr->next;
+					else
+						curr_zone->free_list = curr->next;
+
+					t_bloc* new_free = split_block(curr, size);
+					if (new_free)
+						insert_bloc(curr_zone, new_free);
+					return curr;
 				}
-				curr_free_block = curr_free_block->next;
+				prev = curr;
+				curr = curr->next;
 			}
 		}
 		curr_zone = curr_zone->next;
@@ -63,7 +100,7 @@ static t_bloc *find_free_space(size_t size)
 	return NULL;
 }
 
-t_bloc *allocate_from_zone(t_type type)
+t_bloc *allocate_from_zone(t_type type, size_t size)
 {
 	size_t	data_size;
 	size_t page_size = sysconf(_SC_PAGE_SIZE);
@@ -88,34 +125,32 @@ t_bloc *allocate_from_zone(t_type type)
 	new_zone->next = g_zone;
 	new_zone->size = total_size;
 	new_zone->type = type;
+	new_zone->free_list = NULL;
 
 	t_bloc	*new_bloc = (t_bloc*)((char*)new_zone + sizeof(t_zone));
 	new_bloc->is_free = 1;
+	new_bloc->prev = NULL;
 	new_bloc->next = NULL;
 	new_bloc->size = data_size - sizeof(t_bloc);
 	new_zone->free_list = new_bloc;
 
+	t_bloc* free_bloc = split_block(new_bloc, size);
+	free_bloc->next = NULL;
+	free_bloc->prev = NULL;
+	new_zone->free_list = free_bloc;
 	g_zone = new_zone;
+
 	return new_bloc;
 }
 
 t_bloc *request_space(size_t size)
 {
-	t_bloc* new_space;
-
 	if (size <= TINY_MAX)
-		new_space = allocate_from_zone(TINY);
+		return allocate_from_zone(TINY, size);
 	else if (size > TINY_MAX && size <= SMALL_MAX)
-		new_space = allocate_from_zone(SMALL);
+		return allocate_from_zone(SMALL, size);
 	else
-		new_space = allocate_from_zone(LARGE);
-
-	if (!new_space)
-		return NULL;
-
-	new_space = split_block(new_space, size);
-
-	return new_space;
+		return allocate_from_zone(LARGE, size);
 }
 
 void *malloc(size_t size)
@@ -130,7 +165,7 @@ void *malloc(size_t size)
 			return NULL;
 	}
 	
-	return (void*)(block + 1);
+	return (void*)((char*)block + sizeof(t_bloc));
 }
 
 int main()
@@ -138,15 +173,7 @@ int main()
 	char* test = malloc(42);
 	if (!test)
 		ft_printf("erreur");
-	test[0] = 'a';
-	ft_printf("%c", test[0]);
-
-	t_bloc* curr = g_zone->free_list;
-	while (curr)
-	{
-		ft_printf("%p", curr);
-		curr = curr->next;
-	}
+	test[41] = 'a';
 	
 	return 0;
 }
