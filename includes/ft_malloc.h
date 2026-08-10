@@ -43,6 +43,7 @@ extern t_zone *g_zone;
 // |					ft_malloc_alloc.c					|
 // |														|
 // # ====================================================== #
+
 t_type	get_zone_type(size_t size);
 size_t	round_up_page_size(size_t size);
 t_bloc	*allocate_from_zone(t_type type, size_t size);
@@ -54,6 +55,7 @@ t_bloc	*request_space(size_t size);
 // |					ft_malloc_utils.c					|
 // |														|
 // # ====================================================== #
+
 size_t 	get_data_size(t_type type);
 t_bloc	*split_block(t_bloc *bloc, size_t size);
 void	insert_bloc(t_zone *zone, t_bloc *insert);
@@ -64,6 +66,7 @@ t_bloc	*find_free_space(size_t size);
 // |					ft_malloc.c							|
 // |														|
 // # ====================================================== #
+
 void	free(void *ptr);
 void	*malloc(size_t size);
 void	*realloc(void *ptr, size_t size);

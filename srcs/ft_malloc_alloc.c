@@ -20,11 +20,11 @@ size_t round_up_page_size(size_t size)
 
 t_bloc *allocate_from_zone(t_type type, size_t size)
 {
-	size_t data_size;
-	size_t total_size;
-	t_zone *new_zone;
-	t_bloc *new_bloc;
-	t_bloc *free_bloc;
+	size_t data_size = 0;
+	size_t total_size = 0;
+	t_zone *new_zone = NULL;
+	t_bloc *new_bloc = NULL;
+	t_bloc *free_bloc = NULL;
 
 	data_size = get_data_size(type);
 	total_size = round_up_page_size(sizeof(t_zone) + data_size);
@@ -49,9 +49,9 @@ t_bloc *allocate_from_zone(t_type type, size_t size)
 
 t_bloc *allocate_large(size_t size)
 {
-	size_t total_size;
-	t_zone *new_zone;
-	t_bloc *new_bloc;
+	size_t total_size = 0;
+	t_zone *new_zone = NULL;
+	t_bloc *new_bloc = NULL;
 
 	total_size = round_up_page_size(sizeof(t_zone) + sizeof(t_bloc) + size);
 	new_zone = mmap(NULL, total_size, PROT_READ | PROT_WRITE,
