@@ -20,7 +20,7 @@ t_bloc *split_block(t_bloc *bloc, size_t size)
 	new_free_bloc->is_free = 1;
 	new_free_bloc->size = bloc->size - total_occupied;
 	bloc->is_free = 0;
-	bloc->size = size;
+	bloc->size = total_occupied;
 	return new_free_bloc;
 }
 
@@ -78,10 +78,11 @@ t_bloc *find_free_space(size_t size)
 	t_zone*	curr_zone = g_zone;
 	t_bloc*	block = NULL;
 	t_bloc*	new_free = NULL;
+	t_type	zone_type = get_zone_type(size);
 
 	while (curr_zone)
 	{
-		if (curr_zone->type == get_zone_type(size))
+		if (curr_zone->type == zone_type)
 		{
 			block = find_in_zone(curr_zone, size);
 
