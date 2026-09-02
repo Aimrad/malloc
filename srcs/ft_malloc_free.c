@@ -1,6 +1,6 @@
 #include "ft_malloc.h"
 
-static t_bloc *find_bloc_in_zones(void *ptr, t_zone **found_zone)
+t_bloc *find_bloc_in_zones(void *ptr, t_zone **found_zone)
 {
 	t_zone *zone = g_zone;
 	char *zone_start;
@@ -31,6 +31,8 @@ static void free_large_allocation(t_zone *zone)
 		prev = prev->next;
 	if (prev)
 		prev->next = zone->next;
+	else
+		g_zone = zone->next;
 	munmap(zone, zone->size);
 }
 
@@ -54,7 +56,7 @@ static void check_and_free_empty_zone(t_zone *zone)
 {
 	t_bloc *curr = zone->free_list;
 
-	if (curr && curr->size == get_data_size(zone->type))
+	if (curr && curr->next == NULL && curr->size == get_data_size(zone->type))
 	{
 		free_large_allocation(zone);
 	}
