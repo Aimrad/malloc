@@ -29,14 +29,14 @@ int main(void)
 
 	(*ptr1) = 10;
 
-	printf("ptr1=%p - ptr2=%p\n", ptr1, ptr2);
+	ft_printf("ptr1=%p - ptr2=%p\n", ptr1, ptr2);
 
 	ptr1 = (int *) realloc( ptr1, 10 * sizeof(int) );
 	assert( ptr1 != NULL );
 
-	printf( "ptr1=%p - ptr2=%p\n", ptr1, ptr2 );
-	printf( "(*ptr1) = %d\n", *ptr1);
-
+	ft_printf( "ptr1=%p - ptr2=%p\n", ptr1, ptr2 );
+	ft_printf( "(*ptr1) = %d\n", *ptr1);
+	show_alloc_mem();
 	free( ptr1 );
 	free( ptr2 );
 

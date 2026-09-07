@@ -39,7 +39,7 @@ t_bloc *allocate_from_zone(t_type type, size_t size)
 	new_bloc = (t_bloc *)((char *)new_zone + sizeof(t_zone));
 	new_bloc->is_free = 1;
 	new_bloc->next = NULL;
-	new_bloc->size = data_size;
+	new_bloc->size = total_size - sizeof(t_zone);
 	free_bloc = split_block(new_bloc, size);
 	if (free_bloc)
 		insert_bloc(new_zone, free_bloc);
