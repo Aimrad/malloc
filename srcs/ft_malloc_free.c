@@ -55,8 +55,9 @@ static void merge_free_blocks(t_zone *zone)
 static void check_and_free_empty_zone(t_zone *zone)
 {
 	t_bloc *curr = zone->free_list;
+	size_t total_data_size = zone->size - sizeof(t_zone);
 
-	if (curr && curr->next == NULL && curr->size == get_data_size(zone->type))
+	if (curr && curr->next == NULL && curr->size == total_data_size)
 	{
 		free_large_allocation(zone);
 	}

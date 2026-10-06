@@ -8,6 +8,22 @@
             "args": ["debug"],
             "group": "build",
             "problemMatcher": []
+        },
+        {
+            "label": "make test",
+            "type": "shell",
+            "command": "make",
+            "args": ["test"],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "make test-debug",
+            "type": "shell",
+            "command": "make",
+            "args": ["test-debug"],
+            "group": "build",
+            "problemMatcher": []
         }
     ]
 }

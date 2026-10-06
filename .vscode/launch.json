@@ -40,6 +40,21 @@
             "linux": {
                 "miDebuggerPath": "/usr/bin/gdb"
             },
+        },
+        {
+            "name": "Debug malloc tests",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/malloc_test",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "make test-debug",
+            "MIMode": "gdb",
+            "externalConsole": false,
+            "linux": {
+                "miDebuggerPath": "/usr/bin/gdb"
+            }
         }
     ]
 }

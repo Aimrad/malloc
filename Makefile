@@ -12,8 +12,10 @@ LIBFT		= libft
 SRC_DIR		= srcs/
 OBJ_DIR		= obj/
 CC			= gcc
-CFLAGS		= -Wall -Werror -Wextra -I
+CFLAGS		= -Wall -Werror -Wextra
 DEBUGFLAGS	= -g3 -O0
+TEST_NAME	= malloc_test
+TEST_SRC	= tests/test_malloc.c
 RM			= rm -f
 AR			= ar rcs
 
@@ -43,8 +45,18 @@ OBJF		=	.cache_exists
 all:		$(NAME)
 
 debug:		$(LIBFT)/libft.a
-			@$(CC) $(DEBUGFLAGS) -I$(INCLUDE) -I$(LIBFT)/include $(SRC) $(LIBFT)/libft.a -o a.out
+			@$(CC) $(DEBUGFLAGS) -I$(INCLUDE) -I$(LIBFT)/include $(SRC) $(TEST_SRC) $(LIBFT)/libft.a -o a.out
 			@echo "$(GREEN)debug executable compiled!$(DEF_COLOR)"
+
+test:		$(LIBFT)/libft.a
+			@$(CC) $(CFLAGS) $(DEBUGFLAGS) -I$(INCLUDE) -I$(LIBFT)/include $(SRC) $(TEST_SRC) $(LIBFT)/libft.a -o $(TEST_NAME)
+			@./$(TEST_NAME)
+
+test-debug:	$(LIBFT)/libft.a
+			@$(CC) $(CFLAGS) $(DEBUGFLAGS) -I$(INCLUDE) -I$(LIBFT)/include $(SRC) $(TEST_SRC) $(LIBFT)/libft.a -o $(TEST_NAME)
+
+test-valgrind:	test-debug
+			@valgrind --leak-check=full --error-exitcode=1 ./$(TEST_NAME)
 
 $(LIBFT)/libft.a:
 			@$(MAKE) -C $(LIBFT)
@@ -59,7 +71,7 @@ $(NAME):	$(OBJ)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c | $(OBJF)
 			@echo "$(YELLOW)Compiling: $< $(DEF_COLOR)"
-			@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+			@$(CC) $(CFLAGS) -I$(INCLUDE) -c $< -o $@
 
 $(OBJF):
 			@mkdir -p $(OBJ_DIR)
@@ -74,6 +86,7 @@ fclean:		clean
 			@$(RM) -f $(LIBFT)/libft.a
 			@$(RM) libft_malloc.so
 			@$(RM) a.out
+			@$(RM) $(TEST_NAME)
 			@echo "$(CYAN)malloc executable files cleaned!$(DEF_COLOR)"
 			@echo "$(CYAN)libft executable files cleaned!$(DEF_COLOR)"
 
@@ -83,4 +96,4 @@ re:			fclean all
 norm:
 			@norminette $(SRC) $(INCLUDE) $(LIBFT) | grep -v Norme -B1 || true
 
-.PHONY:		all debug clean fclean re norm
+.PHONY:		all debug test test-debug test-valgrind clean fclean re norm
